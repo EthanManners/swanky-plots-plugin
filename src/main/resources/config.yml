@@ -1,0 +1,7 @@
+world: "world"
+claimLimit: 1
+plots:
+  - "ethereal-01"
+  - "ethereal-02"
+gui:
+  title: "Plot Access"

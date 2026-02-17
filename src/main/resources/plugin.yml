@@ -1,0 +1,39 @@
+name: SwankyLandClaims
+version: 1.0.0
+main: PACKAGE.SwankyLandClaimsPlugin
+api-version: '1.21'
+depend: [WorldGuard]
+
+commands:
+  plots:
+    description: List configured plots and ownership info.
+    usage: /plots
+  claim:
+    description: Claim an allowed plot by name.
+    usage: /claim <plot>
+  plot:
+    description: Open plot access GUI.
+    usage: /plot
+  trust:
+    description: Add a player as a member to your plot.
+    usage: /trust <player>
+  untrust:
+    description: Remove a player as a member from your plot.
+    usage: /untrust <player>
+  swankyplots:
+    description: SwankyLandClaims admin commands.
+    usage: /swankyplots reload
+  unclaim:
+    description: Unclaim the plot you currently own.
+    usage: /unclaim
+  plotadmin:
+    description: Administrative plot management commands.
+    usage: /plotadmin <reload|list|unclaim>
+
+permissions:
+  swanky.claim:
+    description: Allow claiming plots.
+    default: true
+  swanky.admin:
+    description: Allows admin actions like reloading plugin config.
+    default: op
