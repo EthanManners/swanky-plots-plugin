@@ -61,7 +61,6 @@ public class WorldGuardHook {
         setMemberAlwaysAllowed(region, Flags.USE);
         setMemberAlwaysAllowed(region, Flags.INTERACT);
         setMemberAlwaysAllowed(region, Flags.CHEST_ACCESS);
-        setMemberAlwaysAllowed(region, Flags.REDSTONE);
 
         setNonMembers(region, Flags.BUILD, toggles.build());
         setNonMembers(region, Flags.BLOCK_BREAK, toggles.build());
@@ -69,7 +68,6 @@ public class WorldGuardHook {
         setNonMembers(region, Flags.USE, toggles.doors());
         setNonMembers(region, Flags.INTERACT, toggles.doors());
         setNonMembers(region, Flags.CHEST_ACCESS, toggles.chests());
-        setNonMembers(region, Flags.REDSTONE, toggles.redstone());
 
         region.setFlag(Flags.PVP, StateFlag.State.ALLOW);
         region.setFlag(Flags.MOB_SPAWNING, StateFlag.State.ALLOW);

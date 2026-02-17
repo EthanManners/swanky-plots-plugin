@@ -90,8 +90,7 @@ public class PlotService {
             ToggleState toggles = new ToggleState(
                     dataConfig.getBoolean(base + ".toggles.build", false),
                     dataConfig.getBoolean(base + ".toggles.doors", false),
-                    dataConfig.getBoolean(base + ".toggles.chests", false),
-                    dataConfig.getBoolean(base + ".toggles.redstone", false)
+                    dataConfig.getBoolean(base + ".toggles.chests", false)
             );
 
             plots.put(normalize(plotName), new PlotRecord(plotName, ownerUuid, ownerName, toggles));
@@ -216,7 +215,6 @@ public class PlotService {
             case BUILD -> old.withBuild(!old.build());
             case DOORS -> old.withDoors(!old.doors());
             case CHESTS -> old.withChests(!old.chests());
-            case REDSTONE -> old.withRedstone(!old.redstone());
         };
 
         PlotRecord updated = current.withToggles(updatedState);
@@ -280,7 +278,7 @@ public class PlotService {
 
     public ToggleState getTogglesForPlot(String plotName) {
         PlotRecord record = plots.get(normalize(plotName));
-        return record != null ? record.toggles() : new ToggleState(false, false, false, false);
+        return record != null ? record.toggles() : new ToggleState(false, false, false);
     }
 
     private OfflinePlayer resolvePlayer(String input) {
@@ -299,7 +297,7 @@ public class PlotService {
         dataConfig.set(base + ".toggles.build", record.toggles().build());
         dataConfig.set(base + ".toggles.doors", record.toggles().doors());
         dataConfig.set(base + ".toggles.chests", record.toggles().chests());
-        dataConfig.set(base + ".toggles.redstone", record.toggles().redstone());
+        dataConfig.set(base + ".toggles.redstone", null);
     }
 
     private String normalize(String plotName) {
@@ -319,23 +317,21 @@ public class PlotService {
         firework.setFireworkMeta(meta);
     }
 
-    public record ToggleState(boolean build, boolean doors, boolean chests, boolean redstone) {
-        public ToggleState withBuild(boolean value) { return new ToggleState(value, doors, chests, redstone); }
-        public ToggleState withDoors(boolean value) { return new ToggleState(build, value, chests, redstone); }
-        public ToggleState withChests(boolean value) { return new ToggleState(build, doors, value, redstone); }
-        public ToggleState withRedstone(boolean value) { return new ToggleState(build, doors, chests, value); }
+    public record ToggleState(boolean build, boolean doors, boolean chests) {
+        public ToggleState withBuild(boolean value) { return new ToggleState(value, doors, chests); }
+        public ToggleState withDoors(boolean value) { return new ToggleState(build, value, chests); }
+        public ToggleState withChests(boolean value) { return new ToggleState(build, doors, value); }
         public boolean get(ToggleKey key) {
             return switch (key) {
                 case BUILD -> build;
                 case DOORS -> doors;
                 case CHESTS -> chests;
-                case REDSTONE -> redstone;
             };
         }
     }
 
     public enum ToggleKey {
-        BUILD, DOORS, CHESTS, REDSTONE
+        BUILD, DOORS, CHESTS
     }
 
     public record PlotRecord(String plotName, UUID ownerUuid, String ownerName, ToggleState toggles) {

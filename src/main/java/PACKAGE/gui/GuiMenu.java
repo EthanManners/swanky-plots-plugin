@@ -41,8 +41,6 @@ public class GuiMenu implements Listener {
                 "Controls use + interact for nonmembers."));
         inventory.setItem(14, toggleItem("Public Chests", state.chests(), Material.CHEST,
                 "Controls chest-access for nonmembers."));
-        inventory.setItem(16, toggleItem("Public Redstone", state.redstone(), Material.REDSTONE,
-                "Controls redstone for nonmembers."));
 
         player.openInventory(inventory);
         openMenus.put(player.getUniqueId(), plotName);
@@ -74,7 +72,6 @@ public class GuiMenu implements Listener {
             case 10 -> ToggleKey.BUILD;
             case 12 -> ToggleKey.DOORS;
             case 14 -> ToggleKey.CHESTS;
-            case 16 -> ToggleKey.REDSTONE;
             default -> null;
         };
 
@@ -111,7 +108,6 @@ public class GuiMenu implements Listener {
             case BUILD -> "Public Build";
             case DOORS -> "Public Doors/Use";
             case CHESTS -> "Public Chests";
-            case REDSTONE -> "Public Redstone";
         };
     }
 
