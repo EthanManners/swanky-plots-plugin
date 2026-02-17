@@ -204,6 +204,53 @@ public class PlotService {
         return ActionResult.success("Untrusted " + targetName + " on plot '" + owned.plotName() + "'.");
     }
 
+    public ActionResult unclaimOwnPlot(Player owner) {
+        Optional<PlotRecord> maybePlot = getSingleOwnedPlot(owner.getUniqueId());
+        if (maybePlot.isEmpty()) {
+            return ActionResult.failure("You do not own a plot to unclaim.");
+        }
+
+        return unclaimRecord(maybePlot.get());
+    }
+
+    public ActionResult adminUnclaim(String plotNameInput) {
+        PlotRecord record = plots.get(normalize(plotNameInput));
+        if (record == null) {
+            return ActionResult.failure("That plot is not in the allowlist.");
+        }
+
+        if (!record.isClaimed()) {
+            return ActionResult.failure("Plot '" + record.plotName() + "' is already unclaimed.");
+        }
+
+        return unclaimRecord(record);
+    }
+
+    private ActionResult unclaimRecord(PlotRecord record) {
+        ProtectedRegion region = worldGuardHook.getRegion(worldName, record.plotName());
+        if (region == null) {
+            return ActionResult.failure("WorldGuard region '" + record.plotName() + "' does not exist in world '" + worldName + "'.");
+        }
+
+        UUID ownerUuid = record.ownerUuid();
+        if (ownerUuid != null) {
+            worldGuardHook.removeOwner(region, ownerUuid);
+        }
+        worldGuardHook.clearMembers(region);
+
+        PlotRecord updated = new PlotRecord(record.plotName(), null, "",
+                new ToggleState(false, false, false));
+        plots.put(normalize(record.plotName()), updated);
+        savePlotRecord(updated);
+
+        worldGuardHook.applyFlags(region, updated.toggles());
+        worldGuardHook.saveChanges(worldName);
+        saveData();
+
+        return ActionResult.success("Plot '" + updated.plotName() + "' has been unclaimed.");
+    }
+
+
     public boolean toggle(String plotName, ToggleKey key) {
         PlotRecord current = plots.get(normalize(plotName));
         if (current == null) {

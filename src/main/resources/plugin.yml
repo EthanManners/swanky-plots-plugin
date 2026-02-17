@@ -23,6 +23,12 @@ commands:
   swankyplots:
     description: SwankyLandClaims admin commands.
     usage: /swankyplots reload
+  unclaim:
+    description: Unclaim the plot you currently own.
+    usage: /unclaim
+  plotadmin:
+    description: Administrative plot management commands.
+    usage: /plotadmin <reload|list|unclaim>
 
 permissions:
   swanky.claim:

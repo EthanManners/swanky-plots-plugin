@@ -54,6 +54,14 @@ public class WorldGuardHook {
         region.getMembers().removePlayer(uuid);
     }
 
+    public void removeOwner(ProtectedRegion region, UUID uuid) {
+        region.getOwners().removePlayer(uuid);
+    }
+
+    public void clearMembers(ProtectedRegion region) {
+        region.getMembers().clear();
+    }
+
     public void applyFlags(ProtectedRegion region, PlotService.ToggleState toggles) {
         setMemberAlwaysAllowed(region, Flags.BUILD);
         setMemberAlwaysAllowed(region, Flags.BLOCK_BREAK);

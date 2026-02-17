@@ -3,8 +3,10 @@ package PACKAGE;
 import PACKAGE.commands.ClaimCommand;
 import PACKAGE.commands.PlotCommand;
 import PACKAGE.commands.PlotsCommand;
+import PACKAGE.commands.PlotAdminCommand;
 import PACKAGE.commands.SwankyPlotsCommand;
 import PACKAGE.commands.TrustCommand;
+import PACKAGE.commands.UnclaimCommand;
 import PACKAGE.gui.GuiMenu;
 import PACKAGE.hook.WorldGuardHook;
 import PACKAGE.service.PlotService;
@@ -46,6 +48,7 @@ public class SwankyLandClaimsPlugin extends JavaPlugin {
         ClaimCommand claimCommand = new ClaimCommand(plotService);
         PlotCommand plotCommand = new PlotCommand(plotService, guiMenu);
         TrustCommand trustCommand = new TrustCommand(plotService);
+        PlotAdminCommand plotAdminCommand = new PlotAdminCommand(plotService);
 
         PluginCommand claim = Objects.requireNonNull(getCommand("claim"));
         claim.setExecutor(claimCommand);
@@ -56,5 +59,11 @@ public class SwankyLandClaimsPlugin extends JavaPlugin {
         Objects.requireNonNull(getCommand("trust")).setExecutor(trustCommand);
         Objects.requireNonNull(getCommand("untrust")).setExecutor(trustCommand);
         Objects.requireNonNull(getCommand("swankyplots")).setExecutor(new SwankyPlotsCommand(plotService));
+
+        Objects.requireNonNull(getCommand("unclaim")).setExecutor(new UnclaimCommand(plotService));
+
+        PluginCommand plotAdmin = Objects.requireNonNull(getCommand("plotadmin"));
+        plotAdmin.setExecutor(plotAdminCommand);
+        plotAdmin.setTabCompleter(plotAdminCommand);
     }
 }
