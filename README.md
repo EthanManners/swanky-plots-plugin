@@ -1,0 +1,1 @@
+# swanky-plots-plugin
