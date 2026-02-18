@@ -55,7 +55,9 @@ public class SwankyLandClaimsPlugin extends JavaPlugin {
         claim.setTabCompleter(claimCommand);
 
         Objects.requireNonNull(getCommand("plots")).setExecutor(new PlotsCommand(plotService));
-        Objects.requireNonNull(getCommand("plot")).setExecutor(plotCommand);
+        PluginCommand plot = Objects.requireNonNull(getCommand("plot"));
+        plot.setExecutor(plotCommand);
+        plot.setTabCompleter(plotCommand);
         PluginCommand trust = Objects.requireNonNull(getCommand("trust"));
         trust.setExecutor(trustCommand);
         trust.setTabCompleter(trustCommand);

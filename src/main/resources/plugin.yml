@@ -12,8 +12,8 @@ commands:
     description: Claim an allowed plot by name.
     usage: /claim <plot>
   plot:
-    description: Open plot access GUI.
-    usage: /plot
+    description: Open plot access GUI for one of your plots.
+    usage: /plot [plot]
   trust:
     description: Add a player as a member to one of your plots.
     usage: /trust <player> <plot>
