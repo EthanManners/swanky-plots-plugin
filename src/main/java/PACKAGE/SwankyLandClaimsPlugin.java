@@ -48,7 +48,7 @@ public class SwankyLandClaimsPlugin extends JavaPlugin {
         ClaimCommand claimCommand = new ClaimCommand(plotService);
         PlotCommand plotCommand = new PlotCommand(plotService, guiMenu);
         TrustCommand trustCommand = new TrustCommand(plotService);
-        PlotAdminCommand plotAdminCommand = new PlotAdminCommand(plotService);
+        PlotAdminCommand plotAdminCommand = new PlotAdminCommand(plotService, guiMenu);
 
         PluginCommand claim = Objects.requireNonNull(getCommand("claim"));
         claim.setExecutor(claimCommand);
@@ -56,8 +56,13 @@ public class SwankyLandClaimsPlugin extends JavaPlugin {
 
         Objects.requireNonNull(getCommand("plots")).setExecutor(new PlotsCommand(plotService));
         Objects.requireNonNull(getCommand("plot")).setExecutor(plotCommand);
-        Objects.requireNonNull(getCommand("trust")).setExecutor(trustCommand);
-        Objects.requireNonNull(getCommand("untrust")).setExecutor(trustCommand);
+        PluginCommand trust = Objects.requireNonNull(getCommand("trust"));
+        trust.setExecutor(trustCommand);
+        trust.setTabCompleter(trustCommand);
+
+        PluginCommand untrust = Objects.requireNonNull(getCommand("untrust"));
+        untrust.setExecutor(trustCommand);
+        untrust.setTabCompleter(trustCommand);
         Objects.requireNonNull(getCommand("swankyplots")).setExecutor(new SwankyPlotsCommand(plotService));
 
         UnclaimCommand unclaimCommand = new UnclaimCommand(plotService);
