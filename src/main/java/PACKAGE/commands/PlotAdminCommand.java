@@ -2,6 +2,8 @@ package PACKAGE.commands;
 
 import PACKAGE.service.PlotService;
 import org.bukkit.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,7 +29,7 @@ public class PlotAdminCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 0) {
-            sender.sendMessage(ChatColor.YELLOW + "Usage: /plotadmin <reload|list|unclaim>");
+            sender.sendMessage(ChatColor.YELLOW + "Usage: /plotadmin <reload|list|claim|unclaim>");
             return true;
         }
 
@@ -57,7 +59,16 @@ public class PlotAdminCommand implements CommandExecutor, TabCompleter {
                 PlotService.ActionResult result = plotService.adminUnclaim(args[1]);
                 sender.sendMessage((result.success() ? ChatColor.GREEN : ChatColor.RED) + result.message());
             }
-            default -> sender.sendMessage(ChatColor.YELLOW + "Usage: /plotadmin <reload|list|unclaim>");
+            case "claim" -> {
+                if (args.length != 3) {
+                    sender.sendMessage(ChatColor.YELLOW + "Usage: /plotadmin claim <player> <plot>");
+                    return true;
+                }
+
+                PlotService.ActionResult result = plotService.adminClaim(args[1], args[2]);
+                sender.sendMessage((result.success() ? ChatColor.GREEN : ChatColor.RED) + result.message());
+            }
+            default -> sender.sendMessage(ChatColor.YELLOW + "Usage: /plotadmin <reload|list|claim|unclaim>");
         }
 
         return true;
@@ -71,7 +82,7 @@ public class PlotAdminCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 1) {
             String token = args[0].toLowerCase(Locale.ROOT);
-            return List.of("reload", "list", "unclaim").stream()
+            return List.of("reload", "list", "claim", "unclaim").stream()
                     .filter(s -> s.startsWith(token))
                     .toList();
         }
@@ -81,6 +92,31 @@ public class PlotAdminCommand implements CommandExecutor, TabCompleter {
             List<String> options = new ArrayList<>();
             plotService.getPlotsView().values().forEach(plot -> {
                 if (plot.plotName().toLowerCase(Locale.ROOT).startsWith(token)) {
+                    options.add(plot.plotName());
+                }
+            });
+            options.sort(String.CASE_INSENSITIVE_ORDER);
+            return options;
+        }
+
+        if (args.length == 2 && args[0].equalsIgnoreCase("claim")) {
+            String token = args[1].toLowerCase(Locale.ROOT);
+            List<String> options = new ArrayList<>();
+            for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+                String name = player.getName();
+                if (name != null && name.toLowerCase(Locale.ROOT).startsWith(token)) {
+                    options.add(name);
+                }
+            }
+            options.sort(String.CASE_INSENSITIVE_ORDER);
+            return options;
+        }
+
+        if (args.length == 3 && args[0].equalsIgnoreCase("claim")) {
+            String token = args[2].toLowerCase(Locale.ROOT);
+            List<String> options = new ArrayList<>();
+            plotService.getPlotsView().values().forEach(plot -> {
+                if (!plot.isClaimed() && plot.plotName().toLowerCase(Locale.ROOT).startsWith(token)) {
                     options.add(plot.plotName());
                 }
             });

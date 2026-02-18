@@ -213,6 +213,52 @@ public class PlotService {
         return unclaimRecord(maybePlot.get());
     }
 
+    public ActionResult unclaimOwnPlot(Player owner, String plotNameInput) {
+        PlotRecord record = plots.get(normalize(plotNameInput));
+        if (record == null) {
+            return ActionResult.failure("That plot is not in the allowlist.");
+        }
+
+        if (!owner.getUniqueId().equals(record.ownerUuid())) {
+            return ActionResult.failure("You do not own plot '" + record.plotName() + "'.");
+        }
+
+        return unclaimRecord(record);
+    }
+
+    public ActionResult adminClaim(String playerInput, String plotNameInput) {
+        PlotRecord record = plots.get(normalize(plotNameInput));
+        if (record == null) {
+            return ActionResult.failure("That plot is not in the allowlist.");
+        }
+
+        if (record.isClaimed()) {
+            return ActionResult.failure("That plot is already claimed by " + record.ownerName() + ".");
+        }
+
+        OfflinePlayer target = resolvePlayer(playerInput);
+        if (target == null || target.getUniqueId() == null) {
+            return ActionResult.failure("Could not resolve player '" + playerInput + "'.");
+        }
+
+        ProtectedRegion region = worldGuardHook.getRegion(worldName, record.plotName());
+        if (region == null) {
+            return ActionResult.failure("WorldGuard region '" + record.plotName() + "' does not exist in world '" + worldName + "'.");
+        }
+
+        String targetName = target.getName() != null ? target.getName() : target.getUniqueId().toString();
+        PlotRecord updated = record.withOwner(target.getUniqueId(), targetName);
+        plots.put(normalize(record.plotName()), updated);
+        savePlotRecord(updated);
+
+        worldGuardHook.addOwner(region, target.getUniqueId());
+        worldGuardHook.applyFlags(region, updated.toggles());
+        worldGuardHook.saveChanges(worldName);
+        saveData();
+
+        return ActionResult.success("Assigned plot '" + updated.plotName() + "' to " + targetName + ".");
+    }
+
     public ActionResult adminUnclaim(String plotNameInput) {
         PlotRecord record = plots.get(normalize(plotNameInput));
         if (record == null) {

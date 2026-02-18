@@ -60,7 +60,10 @@ public class SwankyLandClaimsPlugin extends JavaPlugin {
         Objects.requireNonNull(getCommand("untrust")).setExecutor(trustCommand);
         Objects.requireNonNull(getCommand("swankyplots")).setExecutor(new SwankyPlotsCommand(plotService));
 
-        Objects.requireNonNull(getCommand("unclaim")).setExecutor(new UnclaimCommand(plotService));
+        UnclaimCommand unclaimCommand = new UnclaimCommand(plotService);
+        PluginCommand unclaim = Objects.requireNonNull(getCommand("unclaim"));
+        unclaim.setExecutor(unclaimCommand);
+        unclaim.setTabCompleter(unclaimCommand);
 
         PluginCommand plotAdmin = Objects.requireNonNull(getCommand("plotadmin"));
         plotAdmin.setExecutor(plotAdminCommand);
