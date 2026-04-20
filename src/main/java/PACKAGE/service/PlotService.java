@@ -154,10 +154,14 @@ public class PlotService {
         return ClaimResult.success("You successfully claimed plot '" + updated.plotName() + "'.");
     }
 
-    public ActionResult trust(Player owner, String targetInput) {
-        Optional<PlotRecord> maybePlot = getSingleOwnedPlot(owner.getUniqueId());
-        if (maybePlot.isEmpty()) {
-            return ActionResult.failure("You do not own a plot.");
+    public ActionResult trust(Player owner, String targetInput, String plotNameInput) {
+        PlotRecord owned = plots.get(normalize(plotNameInput));
+        if (owned == null) {
+            return ActionResult.failure("That plot is not in the allowlist.");
+        }
+
+        if (!owner.getUniqueId().equals(owned.ownerUuid())) {
+            return ActionResult.failure("You do not own plot '" + owned.plotName() + "'.");
         }
 
         OfflinePlayer target = resolvePlayer(targetInput);
@@ -165,10 +169,9 @@ public class PlotService {
             return ActionResult.failure("Could not resolve player '" + targetInput + "'.");
         }
 
-        PlotRecord owned = maybePlot.get();
         ProtectedRegion region = worldGuardHook.getRegion(worldName, owned.plotName());
         if (region == null) {
-            return ActionResult.failure("Your plot region no longer exists in WorldGuard.");
+            return ActionResult.failure("Plot region '" + owned.plotName() + "' no longer exists in WorldGuard.");
         }
 
         worldGuardHook.addMember(region, target.getUniqueId());
@@ -179,10 +182,14 @@ public class PlotService {
         return ActionResult.success("Trusted " + targetName + " on plot '" + owned.plotName() + "'.");
     }
 
-    public ActionResult untrust(Player owner, String targetInput) {
-        Optional<PlotRecord> maybePlot = getSingleOwnedPlot(owner.getUniqueId());
-        if (maybePlot.isEmpty()) {
-            return ActionResult.failure("You do not own a plot.");
+    public ActionResult untrust(Player owner, String targetInput, String plotNameInput) {
+        PlotRecord owned = plots.get(normalize(plotNameInput));
+        if (owned == null) {
+            return ActionResult.failure("That plot is not in the allowlist.");
+        }
+
+        if (!owner.getUniqueId().equals(owned.ownerUuid())) {
+            return ActionResult.failure("You do not own plot '" + owned.plotName() + "'.");
         }
 
         OfflinePlayer target = resolvePlayer(targetInput);
@@ -190,10 +197,9 @@ public class PlotService {
             return ActionResult.failure("Could not resolve player '" + targetInput + "'.");
         }
 
-        PlotRecord owned = maybePlot.get();
         ProtectedRegion region = worldGuardHook.getRegion(worldName, owned.plotName());
         if (region == null) {
-            return ActionResult.failure("Your plot region no longer exists in WorldGuard.");
+            return ActionResult.failure("Plot region '" + owned.plotName() + "' no longer exists in WorldGuard.");
         }
 
         worldGuardHook.removeMember(region, target.getUniqueId());
@@ -204,6 +210,62 @@ public class PlotService {
         return ActionResult.success("Untrusted " + targetName + " on plot '" + owned.plotName() + "'.");
     }
 
+    public ActionResult adminTrust(String targetInput, String plotNameInput) {
+        PlotRecord plot = plots.get(normalize(plotNameInput));
+        if (plot == null) {
+            return ActionResult.failure("That plot is not in the allowlist.");
+        }
+
+        if (!plot.isClaimed()) {
+            return ActionResult.failure("Plot '" + plot.plotName() + "' is unclaimed.");
+        }
+
+        OfflinePlayer target = resolvePlayer(targetInput);
+        if (target == null || target.getUniqueId() == null) {
+            return ActionResult.failure("Could not resolve player '" + targetInput + "'.");
+        }
+
+        ProtectedRegion region = worldGuardHook.getRegion(worldName, plot.plotName());
+        if (region == null) {
+            return ActionResult.failure("Plot region '" + plot.plotName() + "' no longer exists in WorldGuard.");
+        }
+
+        worldGuardHook.addMember(region, target.getUniqueId());
+        worldGuardHook.applyFlags(region, plot.toggles());
+        worldGuardHook.saveChanges(worldName);
+
+        String targetName = target.getName() != null ? target.getName() : target.getUniqueId().toString();
+        return ActionResult.success("Admin-trusted " + targetName + " on plot '" + plot.plotName() + "'.");
+    }
+
+    public ActionResult adminUntrust(String targetInput, String plotNameInput) {
+        PlotRecord plot = plots.get(normalize(plotNameInput));
+        if (plot == null) {
+            return ActionResult.failure("That plot is not in the allowlist.");
+        }
+
+        if (!plot.isClaimed()) {
+            return ActionResult.failure("Plot '" + plot.plotName() + "' is unclaimed.");
+        }
+
+        OfflinePlayer target = resolvePlayer(targetInput);
+        if (target == null || target.getUniqueId() == null) {
+            return ActionResult.failure("Could not resolve player '" + targetInput + "'.");
+        }
+
+        ProtectedRegion region = worldGuardHook.getRegion(worldName, plot.plotName());
+        if (region == null) {
+            return ActionResult.failure("Plot region '" + plot.plotName() + "' no longer exists in WorldGuard.");
+        }
+
+        worldGuardHook.removeMember(region, target.getUniqueId());
+        worldGuardHook.applyFlags(region, plot.toggles());
+        worldGuardHook.saveChanges(worldName);
+
+        String targetName = target.getName() != null ? target.getName() : target.getUniqueId().toString();
+        return ActionResult.success("Admin-untrusted " + targetName + " on plot '" + plot.plotName() + "'.");
+    }
+
     public ActionResult unclaimOwnPlot(Player owner) {
         Optional<PlotRecord> maybePlot = getSingleOwnedPlot(owner.getUniqueId());
         if (maybePlot.isEmpty()) {
@@ -211,6 +273,52 @@ public class PlotService {
         }
 
         return unclaimRecord(maybePlot.get());
+    }
+
+    public ActionResult unclaimOwnPlot(Player owner, String plotNameInput) {
+        PlotRecord record = plots.get(normalize(plotNameInput));
+        if (record == null) {
+            return ActionResult.failure("That plot is not in the allowlist.");
+        }
+
+        if (!owner.getUniqueId().equals(record.ownerUuid())) {
+            return ActionResult.failure("You do not own plot '" + record.plotName() + "'.");
+        }
+
+        return unclaimRecord(record);
+    }
+
+    public ActionResult adminClaim(String playerInput, String plotNameInput) {
+        PlotRecord record = plots.get(normalize(plotNameInput));
+        if (record == null) {
+            return ActionResult.failure("That plot is not in the allowlist.");
+        }
+
+        if (record.isClaimed()) {
+            return ActionResult.failure("That plot is already claimed by " + record.ownerName() + ".");
+        }
+
+        OfflinePlayer target = resolvePlayer(playerInput);
+        if (target == null || target.getUniqueId() == null) {
+            return ActionResult.failure("Could not resolve player '" + playerInput + "'.");
+        }
+
+        ProtectedRegion region = worldGuardHook.getRegion(worldName, record.plotName());
+        if (region == null) {
+            return ActionResult.failure("WorldGuard region '" + record.plotName() + "' does not exist in world '" + worldName + "'.");
+        }
+
+        String targetName = target.getName() != null ? target.getName() : target.getUniqueId().toString();
+        PlotRecord updated = record.withOwner(target.getUniqueId(), targetName);
+        plots.put(normalize(record.plotName()), updated);
+        savePlotRecord(updated);
+
+        worldGuardHook.addOwner(region, target.getUniqueId());
+        worldGuardHook.applyFlags(region, updated.toggles());
+        worldGuardHook.saveChanges(worldName);
+        saveData();
+
+        return ActionResult.success("Assigned plot '" + updated.plotName() + "' to " + targetName + ".");
     }
 
     public ActionResult adminUnclaim(String plotNameInput) {

@@ -48,19 +48,29 @@ public class SwankyLandClaimsPlugin extends JavaPlugin {
         ClaimCommand claimCommand = new ClaimCommand(plotService);
         PlotCommand plotCommand = new PlotCommand(plotService, guiMenu);
         TrustCommand trustCommand = new TrustCommand(plotService);
-        PlotAdminCommand plotAdminCommand = new PlotAdminCommand(plotService);
+        PlotAdminCommand plotAdminCommand = new PlotAdminCommand(plotService, guiMenu);
 
         PluginCommand claim = Objects.requireNonNull(getCommand("claim"));
         claim.setExecutor(claimCommand);
         claim.setTabCompleter(claimCommand);
 
         Objects.requireNonNull(getCommand("plots")).setExecutor(new PlotsCommand(plotService));
-        Objects.requireNonNull(getCommand("plot")).setExecutor(plotCommand);
-        Objects.requireNonNull(getCommand("trust")).setExecutor(trustCommand);
-        Objects.requireNonNull(getCommand("untrust")).setExecutor(trustCommand);
+        PluginCommand plot = Objects.requireNonNull(getCommand("plot"));
+        plot.setExecutor(plotCommand);
+        plot.setTabCompleter(plotCommand);
+        PluginCommand trust = Objects.requireNonNull(getCommand("trust"));
+        trust.setExecutor(trustCommand);
+        trust.setTabCompleter(trustCommand);
+
+        PluginCommand untrust = Objects.requireNonNull(getCommand("untrust"));
+        untrust.setExecutor(trustCommand);
+        untrust.setTabCompleter(trustCommand);
         Objects.requireNonNull(getCommand("swankyplots")).setExecutor(new SwankyPlotsCommand(plotService));
 
-        Objects.requireNonNull(getCommand("unclaim")).setExecutor(new UnclaimCommand(plotService));
+        UnclaimCommand unclaimCommand = new UnclaimCommand(plotService);
+        PluginCommand unclaim = Objects.requireNonNull(getCommand("unclaim"));
+        unclaim.setExecutor(unclaimCommand);
+        unclaim.setTabCompleter(unclaimCommand);
 
         PluginCommand plotAdmin = Objects.requireNonNull(getCommand("plotadmin"));
         plotAdmin.setExecutor(plotAdminCommand);

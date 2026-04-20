@@ -7,28 +7,28 @@ depend: [WorldGuard]
 commands:
   plots:
     description: List configured plots and ownership info.
-    usage: /plots
+    usage: /plots [page]
   claim:
     description: Claim an allowed plot by name.
     usage: /claim <plot>
   plot:
-    description: Open plot access GUI.
-    usage: /plot
+    description: Open plot access GUI for one of your plots.
+    usage: /plot [plot]
   trust:
-    description: Add a player as a member to your plot.
-    usage: /trust <player>
+    description: Add a player as a member to one of your plots.
+    usage: /trust <player> <plot>
   untrust:
-    description: Remove a player as a member from your plot.
-    usage: /untrust <player>
+    description: Remove a player as a member from one of your plots.
+    usage: /untrust <player> <plot>
   swankyplots:
     description: SwankyLandClaims admin commands.
     usage: /swankyplots reload
   unclaim:
-    description: Unclaim the plot you currently own.
-    usage: /unclaim
+    description: Unclaim one of your owned plots by name.
+    usage: /unclaim <plot>
   plotadmin:
     description: Administrative plot management commands.
-    usage: /plotadmin <reload|list|unclaim>
+    usage: /plotadmin <reload|list|claim|unclaim|trust|untrust|gui>
 
 permissions:
   swanky.claim:

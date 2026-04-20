@@ -38,9 +38,9 @@ public class GuiMenu implements Listener {
         inventory.setItem(10, toggleItem("Public Build", state.build(), Material.BRICKS,
                 "Controls build, block-break, block-place for nonmembers."));
         inventory.setItem(12, toggleItem("Public Doors/Use", state.doors(), Material.OAK_DOOR,
-                "Controls use + interact for nonmembers."));
+                "Controls doors, levers, pressure plates, and other use-actions for nonmembers."));
         inventory.setItem(14, toggleItem("Public Chests", state.chests(), Material.CHEST,
-                "Controls chest-access for nonmembers."));
+                "Controls container + interactable inventory access for nonmembers."));
 
         player.openInventory(inventory);
         openMenus.put(player.getUniqueId(), plotName);
@@ -107,7 +107,7 @@ public class GuiMenu implements Listener {
         return switch (key) {
             case BUILD -> "Public Build";
             case DOORS -> "Public Doors/Use";
-            case CHESTS -> "Public Chests";
+            case CHESTS -> "Public Chests/Inventories";
         };
     }
 

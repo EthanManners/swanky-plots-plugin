@@ -74,7 +74,7 @@ public class WorldGuardHook {
         setNonMembers(region, Flags.BLOCK_BREAK, toggles.build());
         setNonMembers(region, Flags.BLOCK_PLACE, toggles.build());
         setNonMembers(region, Flags.USE, toggles.doors());
-        setNonMembers(region, Flags.INTERACT, toggles.doors());
+        setNonMembers(region, Flags.INTERACT, toggles.chests());
         setNonMembers(region, Flags.CHEST_ACCESS, toggles.chests());
 
         region.setFlag(Flags.PVP, StateFlag.State.ALLOW);
